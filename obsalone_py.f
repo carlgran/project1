@@ -1,23 +1,54 @@
 C FILE: obsalone_py.f
       
       !program test_obs
-	  subroutine test_obs(isn,wt,q2t,thi,phii,eps,lmx,t_amp,t_obs)
+	  subroutine test_obs(isn,wt,q2t,thi,phii,eps,lmx,t_obs,nob,
+     >ragami,iagami,rTGa,iTGa,cmet,p_count )
 	  
 	  implicit none
 	  
 	  real*8 OBSR(65),parf(188),t_obs, t_amp
-	  real*8 wt,q2t,thi,phii,eps,cme(260)
+	  real*8 wt,q2t,thi,phii,eps,cme(260),cmet(260)
+	  real*8 ragami(3,5,260,4,13,2),iagami(3,5,260,4,13,2)
+	  real*8 rTGa(13,13,5,4,260,3,2),iTGa(13,13,5,4,260,3,2)
+	  real*8 rmat,imat
 	  complex*8 a_gami(3,5,260,4,13,2),TGa(13,13,5,4,260,3,2)
-	  complex*8 m_gam(4,5,13,3,2)
-	  integer par_cnt(13,5,4,3),ipar,np,lmx,isn
+	  complex*8 m_gam(4,5,13,3,2),mat
+	  integer ic1,ic2,kj,iv,iem,ien,j,nob
+	  integer par_cnt(13,5,4,3),ipar,np,lmx,isn,p_count(13,5,4,3)
 	  
 	  common a_gami,TGa,cme,par_cnt
 	  
-Cf2py intent(in) isn,wt,q2t,thi,phii,eps,lmx
-Cf2py intent(out) t_amp, t_obs
+Cf2py intent(in) isn,wt,q2t,thi,phii,eps,lmx,nob
+Cf2py intent(in) ragami,iagami,rTGa,iTGa,cmet,p_count 
+Cf2py intent(out) t_obs
       
-	  call create(1,a_gami,TGa,cme)
-	  call par_count(par_cnt)
+	  !call creater(1,ragami,iagami,rTGa,iTGa,cmet)
+	  !call par_count(par_cnt)
+	  do ic1=1,13
+	  do kj=1,5
+	  do iv=1,4
+	  do iem=1,2
+	  do j=1,3
+	  do ien=1,260
+	  rmat=ragami(j,kj,ien,iv,ic1,iem)
+	  imat=iagami(j,kj,ien,iv,ic1,iem)
+	  mat=complex(rmat,imat)
+	  a_gami(j,kj,ien,iv,ic1,iem)=mat
+	  do ic2=1,13
+	  rmat=rTGa(ic1,ic2,kj,iv,ien,j,iem)
+	  imat=iTGa(ic1,ic2,kj,iv,ien,j,iem)
+	  mat=complex(rmat,imat)
+	  TGa(ic1,ic2,kj,iv,ien,j,iem)=mat
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+	  
+	  cme=cmet
+	  par_cnt=p_count
       
       open(unit=44,file='par_vec4.txt')
  
@@ -42,11 +73,11 @@ Cf2py intent(out) t_amp, t_obs
 	  !eps=0.95
 	  !lmx=2
 	  call get_obs(wt,q2t,thi,phii,eps,isn,parf(1:np),OBSR,lmx)
-	  t_obs= OBSR(42)
+	  t_obs= OBSR(nob)
 	  !print*,t_obs,OBSR(42)
 	  
-	  call get_M(q2t,Wt,parf(1:np),m_gam,lmx)  
-	  t_amp=aimag(m_gam(3,2,1,2,1))
+	  !call get_M(q2t,Wt,parf(1:np),m_gam,lmx)  
+	  !t_amp=aimag(m_gam(3,2,1,2,1))
 	  
 	  
 	  
@@ -1096,6 +1127,8 @@ Cf2py intent(out) t_amp, t_obs
 	  real*8 parv(12),wt,chsq
 	  integer ic,kj,iv,iem,npar,par_cnt(13,5,4,3)
 	  
+Cf2py intent(out) par_cnt
+	  
 	  parv=0.
 	  par_cnt=0
 	  
@@ -1123,9 +1156,79 @@ Cf2py intent(out) t_amp, t_obs
 	  end
 	  
 	  !===============================================================
+				
+	  subroutine creater(ict,ragami,iagami,rTGa,iTGa,cmet)
+	  implicit none
+	  integer ict
+	  integer i_c,k_j,i_v,i_en,i_j,ic,kj,iv,ien,iq2,j,ic1,ic2,ie_m
+	  real*8 cmet(260),ez,ReTGa,AimTGa
+	  real*8 re_alph_NPe,ai_alph_NPe,re_alph_NPm,ai_alph_NPm
+	  real*8 ragami(3,5,260,4,13,2),rTGa(13,13,5,4,260,3,2)
+	  real*8 iagami(3,5,260,4,13,2),iTGa(13,13,5,4,260,3,2)
 	  
+Cf2py intent(in) ict
+Cf2py intent(out) ragami,iagami,rTGa,iTGa,cmet
+			
+	  ragami=0.
+	  iagami=0.
+	  rTGa=0.
+	  iTGa=0.
+				   
+	  !opening file with  photocouplings alpha_gamma
+	  open(unit=1,file='vgam_all4.txt')
+				  
+	  read(1,*)
+				  
+	  do i_c=1,13
+	  do k_j=1,5
+	  do i_v=1,4
+	  do i_en=1,260 ! Energy index
+	  do i_j=1,3 ! non-pole (j=1) and pole indexes(j=2,3)
+						  
+	  read(1,*,end=211)ic,kj,iv,ien,iq2,ez,j 
+     >   ,re_alph_NPe,ai_alph_NPe,re_alph_NPm,ai_alph_NPm
+					   
+	  ragami(j,kj,ien,iv,ic,1)=re_alph_NPe
+	  ragami(j,kj,ien,iv,ic,2)=re_alph_NPm
+	  iagami(j,kj,ien,iv,ic,1)=ai_alph_NPe
+	  iagami(j,kj,ien,iv,ic,2)=ai_alph_NPm
+				  
+	  cmet(ien)=ez
+				  
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+	  enddo
+				  
+211   close(unit=1)
+	  
+	  !---------------------------------------------------------------
+		  
+	  !Calling file with rescattering term, TGa=T_transport * G *alpha_gamma 
+				   
+	  open(unit=2, file='rescatt_mat2.txt')				  
+				  
+	  read(2,*)
+				  
+	  do 
+	  read(2,*,end=212)ic1,ic2,kj,iv,ien,j,ie_m,ReTGa,AimTGa
+	  !print*,ReTGa,AimTGa
+	  if(ic1.eq.ict+1)exit
+	  rTGa(ic1,ic2,kj,iv,ien,j,ie_m)=ReTGa
+	  iTGa(ic1,ic2,kj,iv,ien,j,ie_m)=AimTGa
+				  
+	  enddo
+				  
+212   close(unit=2)
+			
+	  !---------------------------------------------------------------
+	  end
+
+	  !===============================================================
 C END OF FILE obsalone_py.f
 	  
+
 
 
 
