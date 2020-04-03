@@ -1,0 +1,91 @@
+0		|enter 0 for all observables, 1 for a selection
+1   	|enter number of observables
+Enter observable indexes below
+42
+Enter energy range in MeV:
+1220.0 	|lower bound
+1240.0 	|upper bound
+Enter Q^2 range in GeV
+0.      |lower bound
+4.      |upper bound
+Enter polar angle range in DEG 
+0.      |lower bound
+180.    |upper bound
+Enter azimuthal angle range in DEG:
+-360.  	|lower bound
+360.	|upper bound
+
+*Observable  index (Taken from PRC 96, 025210 (2017))
+Response functions(1-36)
+Differential cross section (37-42)
+Photoproduction observables (43-57)
+RT00			1
+RT0Y(-KD1N)		2
+RTYP0			3
+RTXPX			4
+RTXPZ 			5
+RTZPX 			6
+RTZPZ 			7
+RL00			8
+RL0Y			9
+RLXPX			10
+RLZPX			11
+RLT00(RLT,KD1E)		12
+RLT0X			13
+RLT0Y(-KD1F)		14
+RLT0Z			15
+RLTXP0(KD1H)		16
+RLTZP0(KD1G)		17
+RLTXPX			18
+RLTZPX			19
+RTT00(KD1M)		20
+RTT0X			21
+RTT0Z			22
+RTTXP0(KD1P)		23
+RTTZP0(KD1O)		24
+RLTP00(RLTP,KD1I)	25
+RLTP0X			26
+RLTP0Y(-KD1J)		27
+RLTP0Z			28
+RLTPXP0(KD1L)		29	
+RLTPZP0(KD1K)		30
+RLTPXPX			31
+RLTPZPX			32
+RTTP0X			33
+RTTP0Z			34
+RTTPXP0(KD1R)		35
+RTTPZP0(KD1Q)		36
+dsT             	37
+dsL			38
+dsTT(DTT)		39
+dsTL(DTL)		40
+dsTLP			41
+DSG             	42
+T			43
+P			44
+TXP			45
+LXP			46
+TZP			47
+LZP			48
+S			49
+H			50
+G			51
+OX			52
+OZ			53
+F			54
+E			55
+CXP			56
+CZP			57
+A0Y			58
+A0YP			59
+DTLs(DSTL)		60
+PXh(PX)			61
+PY			62
+PZh(PZ)			63
+RTLs(KD1T)		64
+(KD1S)			65
+AE			66
+AT			67
+AET			68
+SGT 			69
+
